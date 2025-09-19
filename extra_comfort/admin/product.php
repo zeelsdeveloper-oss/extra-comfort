@@ -10,7 +10,7 @@ if (strlen($_SESSION['id'] == 0)) {
     <html lang="en">
 
     <head>
-        <title>Services</title>
+        <title>Product</title>
 
         <link
             href="http://fonts.googleapis.com/css?family=Lato:300,400,400italic,600,700|Raleway:300,400,500,600,700|Crete+Round:400italic"
@@ -47,56 +47,57 @@ if (strlen($_SESSION['id'] == 0)) {
                         <section id="page-title">
                             <div class="row">
                                 <div class="col-sm-8">
-                                    <h1 class="mainTitle">Services</h1>
+                                    <h1 class="mainTitle">Product</h1>
 
 
                                     <!-- Button trigger modal -->
                                     <button type="button" class="btn btn-primary" data-toggle="modal"
-                                        data-target="#exampleModal">
+                                        data-target="#addModal">
                                         Add New Service
                                     </button>
 
-                                    <!-- Modal -->
-                                    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
-                                        aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <form id="serviceForm" method="post" class="modal-content" name="productform">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">New Service</h5>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="form-group">
+                                    <!-- Add Product Modal -->
+                                    <div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="addModalLabel"
+                                        aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form id="addForm" enctype="multipart/form-data">
+                                                    <div class="mb-3">
                                                         <label>Name</label>
                                                         <input type="text" name="name" class="form-control" required>
                                                     </div>
-                                                    <div class="form-group">
+                                                    <div class="mb-3">
                                                         <label>Full Name</label>
                                                         <input type="text" name="full_name" class="form-control" required>
                                                     </div>
-                                                    <div class="form-group">
+                                                    <div class="mb-3">
                                                         <label>Product Type</label>
-                                                        <input type="text" name="product_type" class="form-control"
+                                                        <input type="text" name="prodct_type" class="form-control">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label>Qty</label>
+                                                        <input type="number" name="qty" class="form-control" required>
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label>Size</label>
+                                                        <input type="text" name="size" class="form-control">
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label>MRP</label>
+                                                        <input type="number" step="0.01" name="mrp" class="form-control"
                                                             required>
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label>Qty.</label>
-                                                        <input type="text" name="qty" class="form-control" required>
+                                                    <div class="mb-3">
+                                                        <label>Upload Images</label>
+                                                        <input type="file" name="images[]" class="form-control" multiple>
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label>Size</label>
-                                                        <input type="text" name="size" class="form-control" required>
+
+                                                    <div class="modal-footer">
+                                                        <button type="submit" class="btn btn-success">Save</button>
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label>MRP</label>
-                                                        <input type="text" name="mrp" class="form-control" required>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-primary">Submit</button>
-                                                    <button type="button" class="btn btn-secondary"
-                                                        data-dismiss="modal">Close</button>
-                                                </div>
-                                            </form>
+                                                </form>
+
+                                            </div>
                                         </div>
                                     </div>
 
@@ -142,13 +143,18 @@ if (strlen($_SESSION['id'] == 0)) {
                                         <td><?php echo $row['size']; ?></td>
                                         <td><?php echo $row['mrp']; ?></td>
                                         <td>
+                                            <button class="btn btn-info btn-sm viewBtn"
+                                                data-id="<?= $row['id'] ?>">View</button>
+                                            |
                                             <button class='btn btn-primary btn-sm editBtn'
                                                 data-id='<?= $row['id'] ?>'>Edit</button>
                                             |
-                                            <a href="delete_service.php?id=<?php echo $row['id']; ?>"
-                                                onclick="return confirm('Are you sure you want to delete this service?');">
-                                                Delete
-                                            </a>
+                                            <button class="btn btn-danger">
+                                                <a class="text-white" href="delete_service.php?id=<?php echo $row['id']; ?>"
+                                                    onclick="return confirm('Are you sure you want to delete this service?');">
+                                                    Delete
+                                                </a>
+                                            </button>
                                         </td>
                                     </tr>
                                     <?php
@@ -157,6 +163,23 @@ if (strlen($_SESSION['id'] == 0)) {
                             </tbody>
                         </table>
 
+                        <!-- View Product Modal -->
+                        <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Product Details</h5>
+                                    </div>
+                                    <div class="modal-body" id="viewProductContent"
+                                        style="max-height:70vh; overflow-y:auto;">
+                                        <!-- Product details + images will load here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
                         <!-- Edit Product Modal -->
                         <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog">
@@ -164,8 +187,7 @@ if (strlen($_SESSION['id'] == 0)) {
                                     <div class="modal-header">
                                         <h5 class="modal-title">Edit Product</h5>
                                     </div>
-                                    <div class="modal-body" id="editFormContent">
-                                    </div>
+                                    <div class="modal-body" id="editFormContent"></div>
                                 </div>
                             </div>
                         </div>
@@ -179,8 +201,49 @@ if (strlen($_SESSION['id'] == 0)) {
             <!-- end: SETTINGS -->
         </div>
 
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="vendor/jquery/jquery.min.js"></script>
+
+
         <script>
+            $(document).ready(function () {
+                // View product
+                $(".viewBtn").click(function () {
+                    var id = $(this).data("id");
+
+                    $.ajax({
+                        url: "view_product.php", // new file
+                        type: "GET",
+                        data: { id: id },
+                        success: function (response) {
+                            $("#viewProductContent").html(response);
+                            $("#viewModal").modal("show");
+                        }
+                    });
+                });
+            });
+
+            // Add Product PHP
+            $("#addForm").on("submit", function (e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: "add_product.php",
+                    type: "POST",
+                    data: formData,
+                    contentType: false,   // important
+                    processData: false,   // important
+                    success: function (response) {
+                        if (response.trim() === "success") {
+                            $("#addModal").modal("hide");
+                        }
+                        location.reload();
+                    }
+                });
+            });
+
+
+            // Edit Product PHP
             $(document).ready(function () {
                 $(".editBtn").click(function () {
                     var id = $(this).data("id");

@@ -5,11 +5,15 @@ include('include/config.php');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = intval($_POST['id']);
     $name = trim($_POST['name']);
-    $mrp = floatval($_POST['mrp']);
+    $full_name = trim($_POST['full_name']);
+    $prodct_type = trim($_POST['prodct_type']);
+    $qty = intval($_POST['qty']); // qty should be integer
+    $size = trim($_POST['size']);
+    $mrp = floatval($_POST['mrp']); // mrp as float
 
-    if ($id > 0 && !empty($name) && $mrp > 0) {
-        $stmt = $con->prepare("UPDATE product SET name = ?, mrp = ? WHERE id = ?");
-        $stmt->bind_param("sdi", $name, $mrp, $id);
+    if ($id > 0 && !empty($name) && !empty($full_name) && $qty > 0 && $mrp > 0) {
+        $stmt = $con->prepare("UPDATE product SET name = ?, full_name = ?, prodct_type = ?, qty = ?, size = ?,  mrp = ? WHERE id = ?");
+        $stmt->bind_param("sssisdi", $name, $full_name, $prodct_type, $qty, $size, $mrp, $id);
 
         if ($stmt->execute()) {
             echo "success"; // return success to AJAX
@@ -22,7 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// If loaded for editing
+
+// If loaded for editingss
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
     $stmt = $con->prepare("SELECT * FROM product WHERE id = ?");
@@ -43,7 +48,19 @@ if (isset($_GET['id'])) {
             </div>
             <div class="mb-3">
                 <label>Full Name</label>
-                <input type="number" name="full_name" class="form-control" value="<?= $product['mrp'] ?>">
+                <input type="text" name="full_name" class="form-control" value="<?= $product['full_name'] ?>">
+            </div>
+            <div class="mb-3">
+                <label>Product Type</label>
+                <input type="text" name="prodct_type" class="form-control" value="<?= $product['prodct_type'] ?>">
+            </div>
+            <div class="mb-3">
+                <label>Qty</label>
+                <input type="number" name="qty" class="form-control" value="<?= $product['qty'] ?>">
+            </div>
+            <div class="mb-3">
+                <label>Size</label>
+                <input type="text" name="size" class="form-control" value="<?= $product['size'] ?>">
             </div>
             <div class="mb-3">
                 <label>MRP</label>
